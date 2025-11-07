@@ -1,11 +1,11 @@
 import telebot
 from dotenv import load_dotenv
 import os
-from telebot.types import Message
+from telebot.types import Message, CallbackQuery
 import json
 from pathlib import Path
 from typing import Any
-
+from app.inline_keyboard import get_markup_test_menu
 
 
 load_dotenv()
@@ -35,11 +35,20 @@ def read_json(path: Path) -> Any:
 
 @bot.message_handler(commands=["start"])
 def start_command(message: Message):
-    bot.send_message(chat_id=message.chat.id, text='Приветствуем в боте для подготовке к ОГЭ!')
+    bot.send_message(chat_id=message.chat.id, text='Приветствуем в боте для подготовке к ОГЭ!', reply_markup=get_markup_test_menu())
+    
 
 @bot.message_handler(commands=["help"])
 def help_command(message: Message):
     bot.send_message(chat_id=message.chat.id, text='Помощь зала блин')
+
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call: CallbackQuery) -> None:
+    if call.data == 'cb_practise':
+        bot.send_message(chat_id=call.message.chat.id, text='Практика')
+
 
 if __name__ == "__main__":
     ensure_data()
